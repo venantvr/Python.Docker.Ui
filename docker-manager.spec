@@ -5,7 +5,7 @@ a = Analysis(
     ['docker-manager.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('docker-manager.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
