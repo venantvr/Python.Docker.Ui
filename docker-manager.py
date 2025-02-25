@@ -17,37 +17,45 @@ class DockerManagerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Docker Manager")
-        self.root.geometry("600x400")
+        self.root.geometry("500x200")
         self.root.resizable(False, False)
         try:
             self.root.iconphoto(True, tk.PhotoImage(file="docker-manager.png"))
         except Exception as e:
             logging.warning(f"Impossible de charger l'icône: {e}")
 
-        # Créer la barre de statut AVANT d’appeler get_client
-        self.status_bar = tk.Label(self.root, text="Prêt", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        # Barre de statut avec police 8
+        self.status_bar = tk.Label(self.root, text="Prêt", bd=1, relief=tk.SUNKEN, anchor=tk.W, font=("Arial", 8))
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-        # Initialiser le client après la barre de statut
+        # Initialiser le client
         self.client = self.get_client()
 
-        self.tree = ttk.Treeview(self.root, columns=("ID", "Name", "Status"), show="headings")
+        # Treeview avec police 8 pour les en-têtes
+        self.tree = ttk.Treeview(self.root, columns=("ID", "Name", "Status"), show="headings", height=6)
         self.tree.heading("ID", text="ID")
         self.tree.heading("Name", text="Nom")
         self.tree.heading("Status", text="Statut")
-        self.tree.column("ID", width=100)
-        self.tree.column("Name", width=200)
-        self.tree.column("Status", width=100)
-        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.tree.column("ID", width=80)
+        self.tree.column("Name", width=150)
+        self.tree.column("Status", width=70)
+        self.tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
+        # Appliquer une police globale au Treeview via un style
+        style = ttk.Style()
+        style.configure("Treeview", font=("Arial", 8))
+        style.configure("Treeview.Heading", font=("Arial", 8))
+
+        # Cadre des boutons
         btn_frame = tk.Frame(self.root)
-        btn_frame.pack(pady=10)
+        btn_frame.pack(pady=2)
 
-        tk.Button(btn_frame, text="Actualiser", command=self.refresh_list).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="Démarrer/Arrêter", command=self.toggle_container).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="Supprimer", command=self.delete_container).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="Ouvrir Shell", command=self.open_shell).pack(side=tk.LEFT, padx=5)
-        tk.Button(btn_frame, text="Quitter", command=self.root.quit).pack(side=tk.LEFT, padx=5)
+        # Boutons avec police 8
+        tk.Button(btn_frame, text="Actualiser", command=self.refresh_list, font=("Arial", 8)).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_frame, text="Démarrer/Arrêter", command=self.toggle_container, font=("Arial", 8)).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_frame, text="Supprimer", command=self.delete_container, font=("Arial", 8)).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_frame, text="Ouvrir Shell", command=self.open_shell, font=("Arial", 8)).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_frame, text="Quitter", command=self.root.quit, font=("Arial", 8)).pack(side=tk.LEFT, padx=2)
 
         self.root.bind('<F5>', lambda e: self.refresh_list())
         self.root.bind('<Control-q>', lambda e: self.root.quit())
