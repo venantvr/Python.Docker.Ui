@@ -8,3 +8,4 @@ dist
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/Python.Docker.Ui.iml
 /.idea/vcs.xml
+/docker-manager.log
