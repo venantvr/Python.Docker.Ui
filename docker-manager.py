@@ -4,7 +4,7 @@ import logging
 import subprocess
 import sys
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import ttk
 
 import docker
 
@@ -71,7 +71,7 @@ class DockerManagerApp:
             return client
         except docker.errors.DockerException as e:
             self.status_bar.config(text=f"Erreur: {e}")
-            messagebox.showerror("Erreur", f"Connexion à Docker échouée: {e}")
+            # messagebox.showerror("Erreur", f"Connexion à Docker échouée: {e}")
             logging.error(f"Docker connection failed: {e}")
             sys.exit(1)
 
@@ -94,7 +94,7 @@ class DockerManagerApp:
     def get_selected_container(self):
         selected = self.tree.selection()
         if not selected:
-            messagebox.showwarning("Attention", "Veuillez sélectionner un container.")
+            # messagebox.showwarning("Attention", "Veuillez sélectionner un container.")
             self.status_bar.config(text="Aucun container sélectionné")
             return None
         item = self.tree.item(selected[0])
@@ -109,17 +109,17 @@ class DockerManagerApp:
         try:
             if container.status == "running":
                 container.stop()
-                messagebox.showinfo("Succès", f"Container {container_id} arrêté.")
+                # messagebox.showinfo("Succès", f"Container {container_id} arrêté.")
                 self.status_bar.config(text=f"Container {container_id} arrêté")
                 logging.info(f"Stopped container {container_id}")
             else:
                 container.start()
-                messagebox.showinfo("Succès", f"Container {container_id} démarré.")
+                # messagebox.showinfo("Succès", f"Container {container_id} démarré.")
                 self.status_bar.config(text=f"Container {container_id} démarré")
                 logging.info(f"Started container {container_id}")
             self.refresh_list()
         except docker.errors.APIError as e:
-            messagebox.showerror("Erreur", f"Échec de l'opération: {e}")
+            # messagebox.showerror("Erreur", f"Échec de l'opération: {e}")
             self.status_bar.config(text=f"Erreur: {e}")
             logging.error(f"Failed to toggle container {container_id}: {e}")
 
@@ -127,19 +127,19 @@ class DockerManagerApp:
         container_id = self.get_selected_container()
         if not container_id:
             return
-        if messagebox.askyesno("Confirmer", f"Supprimer le container {container_id} ?"):
-            # noinspection PyUnresolvedReferences
-            try:
-                container = self.client.containers.get(container_id)
-                container.remove(force=True)
-                messagebox.showinfo("Succès", f"Container {container_id} supprimé.")
-                self.status_bar.config(text=f"Container {container_id} supprimé")
-                logging.info(f"Deleted container {container_id}")
-                self.refresh_list()
-            except docker.errors.APIError as e:
-                messagebox.showerror("Erreur", f"Échec de la suppression: {e}")
-                self.status_bar.config(text=f"Erreur: {e}")
-                logging.error(f"Failed to delete container {container_id}: {e}")
+        # if messagebox.askyesno("Confirmer", f"Supprimer le container {container_id} ?"):
+        # noinspection PyUnresolvedReferences
+        try:
+            container = self.client.containers.get(container_id)
+            container.remove(force=True)
+            # messagebox.showinfo("Succès", f"Container {container_id} supprimé.")
+            self.status_bar.config(text=f"Container {container_id} supprimé")
+            logging.info(f"Deleted container {container_id}")
+            self.refresh_list()
+        except docker.errors.APIError as e:
+            # messagebox.showerror("Erreur", f"Échec de la suppression: {e}")
+            self.status_bar.config(text=f"Erreur: {e}")
+            logging.error(f"Failed to delete container {container_id}: {e}")
 
     def open_shell(self):
         container_id = self.get_selected_container()
@@ -147,7 +147,7 @@ class DockerManagerApp:
             return
         container = self.client.containers.get(container_id)
         if container.status != "running":
-            messagebox.showwarning("Attention", "Le container doit être en cours d'exécution.")
+            # messagebox.showwarning("Attention", "Le container doit être en cours d'exécution.")
             self.status_bar.config(text="Container non démarré")
             return
 
@@ -164,7 +164,7 @@ class DockerManagerApp:
                 continue
 
         if not shell:
-            messagebox.showerror("Erreur", "Aucun shell disponible (bash/sh) dans ce container.")
+            # messagebox.showerror("Erreur", "Aucun shell disponible (bash/sh) dans ce container.")
             self.status_bar.config(text="Aucun shell trouvé")
             logging.error(f"No shell available in container {container_id}")
             return
@@ -175,11 +175,11 @@ class DockerManagerApp:
             self.status_bar.config(text=f"Shell ({shell}) ouvert pour {container_id}")
             logging.info(f"Opened {shell} in container {container_id}")
         except FileNotFoundError:
-            messagebox.showerror("Erreur", "xterm non trouvé sur le système.")
+            # messagebox.showerror("Erreur", "xterm non trouvé sur le système.")
             self.status_bar.config(text="xterm non trouvé")
             logging.error("xterm not found")
         except Exception as e:
-            messagebox.showerror("Erreur", f"Échec de l'ouverture du shell: {e}")
+            # messagebox.showerror("Erreur", f"Échec de l'ouverture du shell: {e}")
             self.status_bar.config(text=f"Erreur: {e}")
             logging.error(f"Failed to open shell in {container_id}: {e}")
 
