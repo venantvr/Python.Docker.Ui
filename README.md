@@ -34,10 +34,10 @@ pip install docker pyinstaller
 
 #### 3. Sauvegarder le code
 
-Assure-toi que le code est dans un fichier nommé `docker_manager.py` :
+Assure-toi que le code est dans un fichier nommé `docker-manager.py` :
 
 ```bash
-nano docker_manager.py
+nano docker-manager.py
 ```
 
 Copie-colle le code que tu as fourni, puis sauvegarde (Ctrl+O, Enter, Ctrl+X).
@@ -47,7 +47,7 @@ Copie-colle le code que tu as fourni, puis sauvegarde (Ctrl+O, Enter, Ctrl+X).
 Compile le script en un fichier exécutable unique :
 
 ```bash
-pyinstaller --onefile docker_manager.py
+pyinstaller --onefile docker-manager.py
 ```
 
 - `--onefile` : Crée un seul fichier exécutable contenant tout (Python, Tkinter, docker-py, etc.).
@@ -58,17 +58,17 @@ Une fois la compilation terminée :
 
 ```bash
 # Déplace l’exécutable dans le dossier courant
-mv dist/docker_manager .
-chmod +x docker_manager
+mv dist/docker-manager .
+chmod +x docker-manager
 
 # Teste
-./docker_manager
+./docker-manager
 ```
 
 ### Résultat attendu
 
-- Tu obtiens un fichier `docker_manager` (~10-20 Mo) dans ton dossier.
-- En lançant `./docker_manager`, une fenêtre Tkinter de 600x400 pixels (non redimensionnable) s’ouvre avec la liste des containers Docker et les boutons demandés.
+- Tu obtiens un fichier `docker-manager` (~10-20 Mo) dans ton dossier.
+- En lançant `./docker-manager`, une fenêtre Tkinter de 600x400 pixels (non redimensionnable) s’ouvre avec la liste des containers Docker et les boutons demandés.
 
 ### Dépendances système sur la machine cible
 
@@ -109,7 +109,7 @@ pip install --upgrade pip
 pip install docker pyinstaller
 
 # Sauvegarder le code (remplace cette partie par ton nano ou autre méthode)
-cat << 'EOF' > docker_manager.py
+cat << 'EOF' > docker-manager.py
 #!/usr/bin/env python3
 
 import docker
@@ -230,16 +230,16 @@ if __name__ == "__main__":
 EOF
 
 # Compiler
-pyinstaller --onefile docker_manager.py
+pyinstaller --onefile docker-manager.py
 
 # Récupérer l’exécutable
-mv dist/docker_manager .
-chmod +x docker_manager
+mv dist/docker-manager .
+chmod +x docker-manager
 
 # Désactiver l’environnement virtuel
 deactivate
 
-echo "Exécutable prêt : ./docker_manager"
+echo "Exécutable prêt : ./docker-manager"
 echo "Assurez-vous que Docker et xterm sont installés sur la machine cible."
 ```
 
@@ -257,35 +257,35 @@ echo "Assurez-vous que Docker et xterm sont installés sur la machine cible."
 
 ### Si tu as une erreur
 
-- **Permission Docker** : Relogue-toi après `usermod` ou utilise `sudo ./docker_manager`.
+- **Permission Docker** : Relogue-toi après `usermod` ou utilise `sudo ./docker-manager`.
 - **Tkinter manquant** : Rare avec PyInstaller, mais vérifie avec `sudo apt install python3-tk -y`.
 - **xterm** : Installe-le si besoin.
 
-Teste `./docker_manager` et dis-moi si ça fonctionne comme attendu (fenêtre fixe, liste des containers, etc.) ! Je ne peux pas te donner l’exécutable directement, mais
+Teste `./docker-manager` et dis-moi si ça fonctionne comme attendu (fenêtre fixe, liste des containers, etc.) ! Je ne peux pas te donner l’exécutable directement, mais
 ces étapes te donneront exactement ce que tu veux.
 
 # Je veux l'avoir dans le path et créer un raccourci dans la barre lattérale...
 
-Pour mettre ton exécutable `docker_manager` dans le `PATH` et créer un raccourci dans la barre latérale d’Ubuntu (le lanceur, souvent à gauche dans GNOME), voici les
+Pour mettre ton exécutable `docker-manager` dans le `PATH` et créer un raccourci dans la barre latérale d’Ubuntu (le lanceur, souvent à gauche dans GNOME), voici les
 étapes détaillées. Je vais supposer que tu as déjà compilé l’exécutable avec succès en suivant mes instructions précédentes.
 
 ### Étape 1 : Mettre l’exécutable dans le PATH
 
-Cela permet de lancer `docker_manager` desde n’importe où dans le terminal sans spécifier son chemin complet.
+Cela permet de lancer `docker-manager` desde n’importe où dans le terminal sans spécifier son chemin complet.
 
 1. **Déplace l’exécutable dans un dossier du PATH** :
     - Un emplacement courant est `/usr/local/bin`, accessible globalement :
       ```bash
-      sudo mv ./docker_manager /usr/local/bin/docker_manager
+      sudo mv ./docker-manager /usr/local/bin/docker-manager
       ```
     - Vérifie les permissions :
       ```bash
-      sudo chmod +x /usr/local/bin/docker_manager
+      sudo chmod +x /usr/local/bin/docker-manager
       ```
 
 2. **Teste** :
    ```bash
-   docker_manager
+   docker-manager
    ```
    Si la fenêtre s’ouvre, c’est bon ! Sinon, vérifie que `/usr/local/bin` est dans ton `PATH` :
    ```bash
@@ -309,7 +309,7 @@ Pour ajouter une icône dans la barre latérale, il faut créer un fichier `.des
    ```desktop
    [Desktop Entry]
    Name=Docker Manager
-   Exec=/usr/local/bin/docker_manager
+   Exec=/usr/local/bin/docker-manager
    Type=Application
    Terminal=false
    Icon=docker
@@ -364,7 +364,7 @@ Si l’icône "docker" ne fonctionne pas ou si tu veux une icône spécifique :
 
 1. **Lance depuis le terminal** :
    ```bash
-   docker_manager
+   docker-manager
    ```
    La fenêtre devrait s’ouvrir.
 
@@ -374,20 +374,20 @@ Si l’icône "docker" ne fonctionne pas ou si tu veux une icône spécifique :
 
 ### Script pour tout automatiser
 
-Voici un script qui fait tout (supposant que `docker_manager` est déjà compilé dans ton dossier courant) :
+Voici un script qui fait tout (supposant que `docker-manager` est déjà compilé dans ton dossier courant) :
 
 ```bash
 #!/bin/bash
 
 # Mettre dans le PATH
-sudo mv ./docker_manager /usr/local/bin/docker_manager
-sudo chmod +x /usr/local/bin/docker_manager
+sudo mv ./docker-manager /usr/local/bin/docker-manager
+sudo chmod +x /usr/local/bin/docker-manager
 
 # Créer le fichier .desktop
 cat << EOF > ~/.local/share/applications/docker-manager.desktop
 [Desktop Entry]
 Name=Docker Manager
-Exec=/usr/local/bin/docker_manager
+Exec=/usr/local/bin/docker-manager
 Type=Application
 Terminal=false
 Icon=docker
@@ -397,7 +397,7 @@ EOF
 
 chmod +x ~/.local/share/applications/docker-manager.desktop
 
-echo "Exécutable ajouté au PATH : /usr/local/bin/docker_manager"
+echo "Exécutable ajouté au PATH : /usr/local/bin/docker-manager"
 echo "Raccourci créé. Cherchez 'Docker Manager' dans le menu et ajoutez-le à la barre latérale."
 echo "Assurez-vous que Docker et xterm sont installés :"
 echo "  sudo apt install docker.io xterm -y"
@@ -418,7 +418,7 @@ echo "  sudo usermod -aG docker \$USER (puis reloguez-vous)"
 
 ### Résultat
 
-- Tu peux lancer `docker_manager` depuis n’importe quel terminal.
+- Tu peux lancer `docker-manager` depuis n’importe quel terminal.
 - Une icône "Docker Manager" est dans le menu des applications, et tu peux l’épingler dans la barre latérale.
 
 Si quelque chose ne marche pas (ex. icône absente, exécutable non trouvé), dis-moi, et je t’aiderai à ajuster !
