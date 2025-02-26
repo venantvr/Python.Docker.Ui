@@ -1,4 +1,4 @@
 {
   "261e92c318c3": "docker run bkimminich/juice-shop /juice-shop/build/app.js",
-  "c0d1ea221d48": "docker run --rm --name juice-shop -p 127.0.0.1:3000:3000 bkimminich/juice-shop /juice-shop/build/app.js"
+  "d03529a4362d": "docker run --rm --name juice-shop -p 127.0.0.1:3000:3000 bkimminich/juice-shop /juice-shop/build/app.js"
 }

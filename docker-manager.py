@@ -88,8 +88,18 @@ class DockerManagerApp:
 
     def save_commands(self):
         try:
+            # Inverser le dictionnaire : commandes comme clés, IDs comme valeurs
+            # Cela écrase automatiquement les anciennes clés par les nouvelles (dernier vu gagne)
+            reversed_dict = {}
+            for cid, cmd in self.commands.items():
+                reversed_dict[cmd] = cid
+
+            # Revenir au format original : IDs comme clés, commandes comme valeurs
+            deduplicated_commands = {cid: cmd for cmd, cid in reversed_dict.items()}
+
+            # Sauvegarder le dictionnaire dédoublonné
             with open(COMMAND_FILE, 'w') as f:
-                json.dump(self.commands, f, indent=2)
+                json.dump(deduplicated_commands, f, indent=2)
             self.update_commands_text()
         except Exception as e:
             logging.error(f"Erreur lors de la sauvegarde des commandes: {e}")
