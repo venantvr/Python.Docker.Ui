@@ -16,7 +16,7 @@ logging.basicConfig(filename='docker-manager.log', level=logging.INFO,
 COMMAND_FILE = "container_commands.json"
 
 
-# noinspection PyShadowingNames,PyUnresolvedReferences,PyMethodMayBeStatic,PyTypeChecker
+# noinspection PyShadowingNames,PyUnresolvedReferences,PyMethodMayBeStatic,PyTypeChecker,PyUnusedLocal
 class DockerManagerApp:
     def __init__(self, root):
         self.root = root
