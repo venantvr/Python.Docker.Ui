@@ -14,7 +14,7 @@ import docker
 logging.basicConfig(filename='docker-manager.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-COMMAND_FILE = "container_commands.json"
+COMMAND_FILE = "container-commands.json"
 
 
 # noinspection PyShadowingNames,PyUnresolvedReferences,PyMethodMayBeStatic,PyTypeChecker,PyUnusedLocal
@@ -137,6 +137,25 @@ class DockerManagerApp:
         if line:
             try:
                 cmd = line.split(":", 1)[1].strip()
+                # Extraire le nom du conteneur s'il existe dans la commande
+                cmd_parts = cmd.split()
+                container_name = None
+                for i, part in enumerate(cmd_parts):
+                    if part == "--name" and i + 1 < len(cmd_parts):
+                        container_name = cmd_parts[i + 1]
+                        break
+
+                # Si un nom est spécifié, vérifier et supprimer un conteneur existant avec ce nom
+                if container_name:
+                    try:
+                        existing_container = self.client.containers.get(container_name)
+                        logging.info(f"Conteneur existant '{container_name}' trouvé, suppression en cours...")
+                        existing_container.remove(force=True)
+                        self.status_bar.config(text=f"Conteneur existant {container_name} supprimé avant relance")
+                    except docker.errors.NotFound:
+                        pass  # Le conteneur n'existe pas, on peut continuer
+
+                # Lancer la commande
                 subprocess.Popen(cmd, shell=True)
                 self.status_bar.config(text=f"Lancement de: {cmd}")
                 logging.info(f"Lancement de la commande: {cmd}")
@@ -144,6 +163,9 @@ class DockerManagerApp:
             except IndexError:
                 self.status_bar.config(text="Erreur: Commande mal formée")
                 logging.error(f"Commande mal formée: {line}")
+            except docker.errors.APIError as e:
+                self.status_bar.config(text=f"Erreur API Docker: {e}")
+                logging.error(f"Erreur API lors du lancement: {e}")
             except Exception as e:
                 self.status_bar.config(text=f"Erreur de lancement: {e}")
                 logging.error(f"Erreur lors du lancement: {e}")

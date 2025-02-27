@@ -5,7 +5,7 @@ a = Analysis(
     ['docker-manager.py'],
     pathex=[],
     binaries=[],
-    datas=[('docker-manager.png', '.')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -35,4 +35,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['docker-manager.png'],
 )
