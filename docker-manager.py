@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import docker
+from ttkthemes import ThemedTk
 
 logging.basicConfig(filename='docker-manager.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -29,7 +30,7 @@ class DockerManagerApp:
         except Exception as e:
             logging.warning(f"Impossible de charger l'icône: {e}")
 
-        self.status_bar = tk.Label(self.root, text="Prêt", bd=1, relief=tk.SUNKEN, anchor=tk.W, font=("Arial", 10))
+        self.status_bar = ttk.Label(self.root, text="Prêt", relief=tk.SUNKEN, anchor=tk.W)
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.client = self.get_client()
@@ -47,24 +48,24 @@ class DockerManagerApp:
         self.tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         style = ttk.Style()
-        style.configure("Treeview", font=("Arial", 10))
-        style.configure("Treeview.Heading", font=("Arial", 10))
+        style.configure("Treeview")
+        style.configure("Treeview.Heading")
 
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=2)
 
         # Initialisation des boutons comme variables d'instance
-        self.refresh_btn = tk.Button(btn_frame, text="Actualiser", command=self.refresh_list, font=("Arial", 10))
+        self.refresh_btn = ttk.Button(btn_frame, text="Actualiser", command=self.refresh_list)
         self.refresh_btn.pack(side=tk.LEFT, padx=2)
-        self.toggle_btn = tk.Button(btn_frame, text="Démarrer/Arrêter", command=self.toggle_container, font=("Arial", 10))
+        self.toggle_btn = ttk.Button(btn_frame, text="Démarrer/Arrêter", command=self.toggle_container)
         self.toggle_btn.pack(side=tk.LEFT, padx=2)
-        self.delete_btn = tk.Button(btn_frame, text="Supprimer", command=self.delete_container, font=("Arial", 10))
+        self.delete_btn = ttk.Button(btn_frame, text="Supprimer", command=self.delete_container)
         self.delete_btn.pack(side=tk.LEFT, padx=2)
-        self.shell_btn = tk.Button(btn_frame, text="Ouvrir Shell", command=self.open_shell, font=("Arial", 10))
+        self.shell_btn = ttk.Button(btn_frame, text="Ouvrir Shell", command=self.open_shell)
         self.shell_btn.pack(side=tk.LEFT, padx=2)
-        self.logs_btn = tk.Button(btn_frame, text="Logs", command=self.open_logs, font=("Arial", 10))
+        self.logs_btn = ttk.Button(btn_frame, text="Logs", command=self.open_logs)
         self.logs_btn.pack(side=tk.LEFT, padx=2)
-        tk.Button(btn_frame, text="Quitter", command=self.root.quit, font=("Arial", 10)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(btn_frame, text="Quitter", command=self.root.quit)
 
         # Désactiver les boutons par défaut (sauf Actualiser et Quitter)
         self.toggle_btn.config(state=tk.DISABLED)
@@ -76,7 +77,7 @@ class DockerManagerApp:
         self.tree.bind('<<TreeviewSelect>>', self.check_selection)
 
         # Liste cliquable pour lancer (lecture seule, avec survol)
-        self.launch_cmds_text = tk.Text(self.root, height=12, font=("Arial", 10), wrap=tk.WORD, cursor="hand2")
+        self.launch_cmds_text = tk.Text(self.root, height=12, wrap=tk.WORD, cursor="hand2")
         self.launch_cmds_text.pack(fill=tk.X, padx=5, pady=5)
         self.launch_cmds_text.config(state=tk.DISABLED)
         self.launch_cmds_text.tag_configure("highlight", background="lightblue")
@@ -393,6 +394,8 @@ class DockerManagerApp:
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    # root = tk.Tk()
+    root = ThemedTk(theme="ubuntu")  # Mode sombre natif
+    print(root.get_themes())
     app = DockerManagerApp(root)
     root.mainloop()

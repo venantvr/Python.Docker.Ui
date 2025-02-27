@@ -1,5 +1,5 @@
 * pyinstaller --onefile --icon=docker-manager.png docker-manager.py
-* sudo mv ./docker-manager /usr/local/bin/docker-manager
+* sudo mv ./dist/docker-manager /usr/local/bin/docker-manager
 
 # Compilation
 
