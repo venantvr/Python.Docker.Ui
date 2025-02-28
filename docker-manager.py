@@ -36,7 +36,7 @@ class DockerManagerApp:
         self.client = self.get_client()
 
         # Ajout de la colonne "Ports" dans le Treeview
-        self.tree = ttk.Treeview(self.root, columns=("ID", "Name", "Status", "Ports"), show="headings", height=4)
+        self.tree = ttk.Treeview(self.root, columns=("ID", "Name", "Status", "Ports"), show="headings", height=4, selectmode="browse")
         self.tree.heading("ID", text="ID")
         self.tree.heading("Name", text="Nom")
         self.tree.heading("Status", text="Statut")
@@ -47,9 +47,14 @@ class DockerManagerApp:
         self.tree.column("Ports", width=150)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
+        # Configuration du style pour le Treeview
         style = ttk.Style()
-        style.configure("Treeview")
-        style.configure("Treeview.Heading")
+        style.configure("Treeview", rowheight=25)  # Hauteur des lignes pour lisibilité
+        style.configure("Treeview.Heading", font=('Helvetica', 10, 'bold'))
+        # Ajout d'un style pour la sélection
+        style.map("Treeview",
+                  background=[('selected', '#4a6984')],  # Couleur de fond pour la sélection
+                  foreground=[('selected', 'white')])  # Couleur du texte pour la sélection
 
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=2)
