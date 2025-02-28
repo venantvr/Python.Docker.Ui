@@ -1,6 +1,8 @@
 .venv
 build
 dist
+docker-manager.log
+container-commands.json
 /.idea/.gitignore
 /.idea/misc.xml
 /.idea/modules.xml
@@ -8,4 +10,3 @@ dist
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/Python.Docker.Ui.iml
 /.idea/vcs.xml
-/docker-manager.log
