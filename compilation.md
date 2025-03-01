@@ -1,3 +1,4 @@
+* sudo apt install xdotool
 * pyinstaller --onefile --icon=docker-manager.png docker-manager.py
 * sudo mv ./dist/docker-manager /usr/local/bin/docker-manager
 

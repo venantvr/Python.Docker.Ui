@@ -16,6 +16,7 @@ logging.basicConfig(filename='docker-manager.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 COMMAND_FILE = "container-commands.json"
+LOCK_FILE = "/tmp/docker_manager.lock"  # Fichier de verrouillage pour le singleton
 
 
 # noinspection PyShadowingNames,PyUnresolvedReferences,PyMethodMayBeStatic,PyTypeChecker,PyUnusedLocal
@@ -49,17 +50,15 @@ class DockerManagerApp:
 
         # Configuration du style pour le Treeview
         style = ttk.Style()
-        style.configure("Treeview", rowheight=25)  # Hauteur des lignes pour lisibilité
+        style.configure("Treeview", rowheight=25)
         style.configure("Treeview.Heading", font=('Helvetica', 10, 'bold'))
-        # Ajout d'un style pour la sélection
         style.map("Treeview",
-                  background=[('selected', '#4a6984')],  # Couleur de fond pour la sélection
-                  foreground=[('selected', 'white')])  # Couleur du texte pour la sélection
+                  background=[('selected', '#4a6984')],
+                  foreground=[('selected', 'white')])
 
         btn_frame = tk.Frame(self.root)
         btn_frame.pack(pady=2)
 
-        # Initialisation des boutons comme variables d'instance
         self.refresh_btn = ttk.Button(btn_frame, text="Actualiser", command=self.refresh_list)
         self.refresh_btn.pack(side=tk.LEFT, padx=2)
         self.toggle_btn = ttk.Button(btn_frame, text="Démarrer/Arrêter", command=self.toggle_container)
@@ -72,16 +71,15 @@ class DockerManagerApp:
         self.logs_btn.pack(side=tk.LEFT, padx=2)
         ttk.Button(btn_frame, text="Quitter", command=self.root.quit)
 
-        # Désactiver les boutons par défaut (sauf Actualiser et Quitter)
         self.toggle_btn.config(state=tk.DISABLED)
         self.delete_btn.config(state=tk.DISABLED)
         self.shell_btn.config(state=tk.DISABLED)
         self.logs_btn.config(state=tk.DISABLED)
 
-        # Lier la vérification de sélection à l'événement de sélection du Treeview
+        # Lier la vérification de sélection et le double-clic
         self.tree.bind('<<TreeviewSelect>>', self.check_selection)
+        self.tree.bind('<Double-1>', lambda e: self.open_shell())  # Ajout du double-clic
 
-        # Liste cliquable pour lancer (lecture seule, avec survol)
         self.launch_cmds_text = tk.Text(self.root, height=12, wrap=tk.WORD, cursor="hand2")
         self.launch_cmds_text.pack(fill=tk.X, padx=5, pady=5)
         self.launch_cmds_text.config(state=tk.DISABLED)
@@ -90,7 +88,6 @@ class DockerManagerApp:
         self.launch_cmds_text.bind('<Leave>', self.clear_highlight)
         self.launch_cmds_text.bind('<Button-1>', self.launch_container_from_cmd)
 
-        # Ajout des tags pour alternance pair/impair
         self.launch_cmds_text.tag_configure("even", background="#F4CFDF")
         self.launch_cmds_text.tag_configure("odd", background="#B6D8F2")
 
@@ -102,7 +99,6 @@ class DockerManagerApp:
         self.update_commands_text()
 
     def check_selection(self, event):
-        """Activer/Désactiver les boutons en fonction de la sélection."""
         selected = self.tree.selection()
         state = tk.NORMAL if selected else tk.DISABLED
         self.toggle_btn.config(state=state)
@@ -399,8 +395,30 @@ class DockerManagerApp:
 
 
 if __name__ == "__main__":
-    # root = tk.Tk()
-    root = ThemedTk(theme="ubuntu")  # Mode sombre natif
-    print(root.get_themes())
-    app = DockerManagerApp(root)
-    root.mainloop()
+    # Vérification du singleton
+    if os.path.exists(LOCK_FILE):
+        try:
+            with open(LOCK_FILE, 'r') as f:
+                pid = int(f.read().strip())
+            # Vérifier si le processus existe encore
+            if os.path.exists(f"/proc/{pid}"):
+                # Ramener la fenêtre au premier plan en cherchant par titre
+                subprocess.run(["xdotool", "search", "--name", "Docker Manager", "windowactivate"])
+                sys.exit(0)
+            else:
+                os.remove(LOCK_FILE)  # Nettoyer si le processus n'existe plus
+        except (ValueError, IOError):
+            os.remove(LOCK_FILE)  # Nettoyer si le fichier est corrompu
+
+    # Créer le fichier de verrouillage avec le PID actuel
+    with open(LOCK_FILE, 'w') as f:
+        f.write(str(os.getpid()))
+
+    try:
+        root = ThemedTk(theme="ubuntu")
+        app = DockerManagerApp(root)
+        root.mainloop()
+    finally:
+        # Supprimer le fichier de verrouillage à la fermeture
+        if os.path.exists(LOCK_FILE):
+            os.remove(LOCK_FILE)
