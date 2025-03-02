@@ -26,6 +26,7 @@ class DockerManagerApp:
         self.root.title("Docker Manager")
         self.root.geometry("700x500")
         self.root.resizable(False, False)
+        self.selected_line = None
         try:
             self.root.iconphoto(True, tk.PhotoImage(file="docker-manager.png"))
         except Exception as e:
@@ -87,6 +88,11 @@ class DockerManagerApp:
         self.launch_cmds_text.bind('<Motion>', self.highlight_line)
         self.launch_cmds_text.bind('<Leave>', self.clear_highlight)
         self.launch_cmds_text.bind('<Button-1>', self.launch_container_from_cmd)
+
+        # Ajout du menu contextuel (clic droit)
+        self.context_menu = tk.Menu(self.root, tearoff=0)
+        self.context_menu.add_command(label="Modifier", command=self.edit_command)
+        self.launch_cmds_text.bind('<Button-3>', self.show_context_menu)  # Button-3 = clic droit
 
         self.launch_cmds_text.tag_configure("even", background="#F4CFDF")
         self.launch_cmds_text.tag_configure("odd", background="#B6D8F2")
@@ -150,6 +156,90 @@ class DockerManagerApp:
 
     def clear_highlight(self, event):
         self.launch_cmds_text.tag_remove("highlight", "1.0", tk.END)
+
+    def show_context_menu(self, event):
+        """Affiche le menu contextuel au clic droit"""
+        line_num = self.launch_cmds_text.index("@%d,%d" % (event.x, event.y)).split('.')[0]
+        self.selected_line = line_num  # Stocker la ligne sélectionnée
+        self.context_menu.post(event.x_root, event.y_root)
+
+    def create_edit_popup(self, title, prompt, initialvalue, cid):
+        popup = tk.Toplevel(self.root)
+        popup.title(title)
+        popup.geometry("600x300")  # Plus grande pour accueillir les améliorations
+        popup.resizable(False, False)
+        popup.transient(self.root)
+        popup.grab_set()
+
+        # Style personnalisé
+        style = ttk.Style()
+        style.configure("Popup.TFrame", relief="flat", borderwidth=0)
+        style.configure("Popup.TLabel", font=('Helvetica', 12, 'bold'))
+
+        # Frame principal
+        frame = ttk.Frame(popup, style="Popup.TFrame", padding="15")
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        # Titre
+        ttk.Label(frame, text=prompt, style="Popup.TLabel").pack(anchor=tk.W, pady=(0, 10))
+
+        # Zone de texte multiligne
+        text_frame = ttk.Frame(frame)
+        text_frame.pack(fill=tk.BOTH, expand=True)
+        entry = tk.Text(text_frame, height=5, width=80, font=('Helvetica', 11), wrap=tk.WORD, relief="flat", borderwidth=1)
+        # entry.pack(fill=tk.BOTH, expand=True, pady=5)
+        entry.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=5)
+        entry.insert("1.0", initialvalue)
+        entry.focus_set()
+
+        # Indicateur de longueur
+        char_count = tk.StringVar(value=f"Caractères : {len(initialvalue)}")
+        ttk.Label(frame, textvariable=char_count, font=('Helvetica', 9)).pack(anchor=tk.W, pady=(0, 10))
+
+        # Mise à jour dynamique du compteur de caractères
+        def update_char_count(*args):
+            char_count.set(f"Caractères : {len(entry.get('1.0', tk.END)) - 1}")  # -1 pour retirer le '\n' final
+
+        entry.bind('<KeyRelease>', update_char_count)
+
+        # Boutons
+        btn_frame = ttk.Frame(frame)
+        btn_frame.pack(fill=tk.X, pady=10)
+        ttk.Button(btn_frame, text="Valider", command=lambda: self.save_popup_command(popup, entry, cid)).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Copier", command=lambda: self.root.clipboard_append(entry.get("1.0", tk.END).strip())).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=popup.destroy).pack(side=tk.LEFT, padx=5)
+
+        return popup
+
+    def save_popup_command(self, popup, entry, cid):
+        new_cmd = entry.get("1.0", tk.END).strip()
+        if new_cmd and new_cmd != self.commands.get(cid, ""):
+            self.commands[cid] = new_cmd
+            self.save_commands()
+            self.status_bar.config(text=f"Commande pour {cid} mise à jour")
+            logging.info(f"Commande mise à jour pour {cid}: {new_cmd}")
+        popup.destroy()
+
+    def edit_command(self):
+        """Modifie la commande sélectionnée et sauvegarde"""
+        if not hasattr(self, 'selected_line'):
+            return
+
+        line_num = self.selected_line
+        line = self.launch_cmds_text.get(f"{line_num}.0", f"{line_num}.end").strip()
+        if not line:
+            return
+
+        try:
+            cid, current_cmd = line.split(":", 1)
+            cid = cid.strip()
+            current_cmd = current_cmd.strip()
+
+            # Nouvelle popup personnalisée
+            self.create_edit_popup("Modifier Commande", "Entrez la nouvelle commande:", current_cmd, cid)
+        except ValueError:
+            self.status_bar.config(text="Erreur: Ligne mal formée")
+            logging.error(f"Ligne mal formée: {line}")
 
     def launch_container_from_cmd(self, event):
         line_num = self.launch_cmds_text.index("@%d,%d" % (event.x, event.y)).split('.')[0]
