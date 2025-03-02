@@ -27,6 +27,7 @@ class DockerManagerApp:
         self.root.geometry("700x500")
         self.root.resizable(False, False)
         self.selected_line = None
+        self.edit_popup_open = False  # Variable pour suivre l'état de la popup
         try:
             self.root.iconphoto(True, tk.PhotoImage(file="docker-manager.png"))
         except Exception as e:
@@ -56,9 +57,6 @@ class DockerManagerApp:
         style.map("Treeview",
                   background=[('selected', '#4a6984')],
                   foreground=[('selected', 'white')])
-
-        # btn_frame = tk.Frame(self.root)
-        # btn_frame.pack(pady=2)
 
         btn_frame = ttk.Frame(self.root)
         btn_frame.pack(pady=2)
@@ -94,8 +92,10 @@ class DockerManagerApp:
 
         # Ajout du menu contextuel (clic droit)
         self.context_menu = tk.Menu(self.root, tearoff=0)
-        self.context_menu.add_command(label="Modifier", command=self.edit_command)
-        self.launch_cmds_text.bind('<Button-3>', self.show_context_menu)  # Button-3 = clic droit
+        self.launch_cmds_text.bind('<Button-3>', self.show_context_menu)  # Clic droit sur la liste
+
+        # Binding global pour supprimer "Modifier" avec un clic gauche n'importe où
+        self.root.bind('<Button-1>', self.remove_modify_option)
 
         self.launch_cmds_text.tag_configure("even", background="#F4CFDF")
         self.launch_cmds_text.tag_configure("odd", background="#B6D8F2")
@@ -161,18 +161,38 @@ class DockerManagerApp:
         self.launch_cmds_text.tag_remove("highlight", "1.0", tk.END)
 
     def show_context_menu(self, event):
-        """Affiche le menu contextuel au clic droit"""
+        """Affiche le menu contextuel au clic droit sur la liste et réinitialise 'Modifier' si nécessaire"""
         line_num = self.launch_cmds_text.index("@%d,%d" % (event.x, event.y)).split('.')[0]
         self.selected_line = line_num  # Stocker la ligne sélectionnée
+
+        # Vérifie si "Modifier" existe, sinon le recrée
+        try:
+            self.context_menu.entrycget("Modifier", "label")  # Teste si "Modifier" existe
+        except tk.TclError:
+            self.context_menu.delete(0, tk.END)  # Nettoie le menu
+            self.context_menu.add_command(label="Modifier", command=self.edit_command)  # Recrée "Modifier"
+
         self.context_menu.post(event.x_root, event.y_root)
 
+    def remove_modify_option(self, event):
+        """Supprime l'option 'Modifier' du menu contextuel après un clic gauche, sauf si la popup est ouverte"""
+        if not self.edit_popup_open:  # Ne supprime que si la popup n'est pas active
+            try:
+                self.context_menu.delete("Modifier")
+            except tk.TclError:
+                pass  # Ignore si "Modifier" n'existe pas déjà dans le menu
+
     def create_edit_popup(self, title, prompt, initialvalue, cid):
+        self.edit_popup_open = True  # Marque la popup comme ouverte
         popup = tk.Toplevel(self.root)
         popup.title(title)
         popup.geometry("600x300")  # Plus grande pour accueillir les améliorations
         popup.resizable(False, False)
         popup.transient(self.root)
         popup.grab_set()
+
+        # Assure que la popup se ferme correctement et met à jour l'état
+        popup.protocol("WM_DELETE_WINDOW", lambda: self.on_popup_close(popup))
 
         # Style personnalisé
         style = ttk.Style()
@@ -190,7 +210,6 @@ class DockerManagerApp:
         text_frame = ttk.Frame(frame)
         text_frame.pack(fill=tk.BOTH, expand=True)
         entry = tk.Text(text_frame, height=5, width=80, font=('Helvetica', 11), wrap=tk.WORD, relief="flat", borderwidth=1)
-        # entry.pack(fill=tk.BOTH, expand=True, pady=5)
         entry.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=5)
         entry.insert("1.0", initialvalue)
         entry.focus_set()
@@ -206,15 +225,12 @@ class DockerManagerApp:
         entry.bind('<KeyRelease>', update_char_count)
 
         # Boutons
-        # btn_frame = ttk.Frame(frame)
-        # btn_frame.pack(fill=tk.X, pady=10)
-
         btn_frame = ttk.Frame(frame)
         btn_frame.pack(pady=2)
 
         ttk.Button(btn_frame, text="Valider", command=lambda: self.save_popup_command(popup, entry, cid)).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Copier", command=lambda: self.root.clipboard_append(entry.get("1.0", tk.END).strip())).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="Annuler", command=popup.destroy).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=lambda: self.on_popup_close(popup)).pack(side=tk.LEFT, padx=5)
 
         return popup
 
@@ -225,6 +241,11 @@ class DockerManagerApp:
             self.save_commands()
             self.status_bar.config(text=f"Commande pour {cid} mise à jour")
             logging.info(f"Commande mise à jour pour {cid}: {new_cmd}")
+        self.on_popup_close(popup)
+
+    def on_popup_close(self, popup):
+        """Ferme la popup et met à jour l'état"""
+        self.edit_popup_open = False
         popup.destroy()
 
     def edit_command(self):
