@@ -57,7 +57,10 @@ class DockerManagerApp:
                   background=[('selected', '#4a6984')],
                   foreground=[('selected', 'white')])
 
-        btn_frame = tk.Frame(self.root)
+        # btn_frame = tk.Frame(self.root)
+        # btn_frame.pack(pady=2)
+
+        btn_frame = ttk.Frame(self.root)
         btn_frame.pack(pady=2)
 
         self.refresh_btn = ttk.Button(btn_frame, text="Actualiser", command=self.refresh_list)
@@ -203,8 +206,12 @@ class DockerManagerApp:
         entry.bind('<KeyRelease>', update_char_count)
 
         # Boutons
+        # btn_frame = ttk.Frame(frame)
+        # btn_frame.pack(fill=tk.X, pady=10)
+
         btn_frame = ttk.Frame(frame)
-        btn_frame.pack(fill=tk.X, pady=10)
+        btn_frame.pack(pady=2)
+
         ttk.Button(btn_frame, text="Valider", command=lambda: self.save_popup_command(popup, entry, cid)).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Copier", command=lambda: self.root.clipboard_append(entry.get("1.0", tk.END).strip())).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Annuler", command=popup.destroy).pack(side=tk.LEFT, padx=5)
