@@ -1,7 +1,7 @@
 {
   "261e92c318c3": "docker run bkimminich/juice-shop /juice-shop/build/app.js",
   "7d7f6137bd19": "docker run --rm --name juice-shop -p 127.0.0.1:3000:3000 bkimminich/juice-shop /juice-shop/build/app.js",
-  "b222cbe4b762": "docker run --name attacker -p 0.0.0.0:5000:5000 -p :::5000:5000 -v /home/rvv/PycharmProjects/Python.Network.Pivot/templates:/app/templates:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/attacker:/app:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/static:/app/static:rw --network pythonnetworkpivot_flat_network pythonnetworkpivot_attacker bash",
+  "e52bbe296c8d": "docker run --name attacker -p 0.0.0.0:5000:5000 -p :::5000:5000 -v /home/rvv/PycharmProjects/Python.Network.Pivot/templates:/app/templates:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/attacker:/app:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/static:/app/static:rw --network pythonnetworkpivot_flat_network pythonnetworkpivot_attacker bash",
   "4bbb55f3b98a": "docker run --name victim1 -v /home/rvv/PycharmProjects/Python.Network.Pivot/victim1:/app:rw --network pythonnetworkpivot_flat_network pythonnetworkpivot_victim1 bash -c pip install twisted",
   "dd835f2448fa": "docker run --name attacker -p 0.0.0.0:5000:5000 -p :::5000:5000 -v /home/rvv/PycharmProjects/Python.Network.Pivot/attacker:/app:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/static:/app/static:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/templates:/app/templates:rw --network pythonnetworkpivot_flat_network pythonnetworkpivot_attacker bash",
   "dbac200798c7": "docker run --name practical_dewdney bkimminich/juice-shop /juice-shop/build/app.js",
@@ -10,5 +10,8 @@
   "8930bd0d4ec8": "docker run --name victim2 -v /home/rvv/PycharmProjects/Python.Network.Pivot/victim2:/app:rw --network pythonnetworkpivot_private_net pythonnetworkpivot_victim2 bash -c pip install twisted && python -m twisted web --port tcp:8001 --path /app & sleep infinity",
   "b0cb52ffe288": "docker run --name attacker -p 0.0.0.0:5000:5000 -p :::5000:5000 -v /home/rvv/PycharmProjects/Python.Network.Pivot/static:/app/static:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/templates:/app/templates:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/attacker:/app:rw --network pythonnetworkpivot_public_net pythonnetworkpivot_attacker bash",
   "7b455d1dbc57": "docker run --name agitated_ptolemy bkimminich/juice-shop /juice-shop/build/app.js",
-  "1fd31f96b1e3": "docker run --name ecstatic_ride bkimminich/juice-shop /juice-shop/build/app.js"
+  "1fd31f96b1e3": "docker run --name ecstatic_ride bkimminich/juice-shop /juice-shop/build/app.js",
+  "af0e9905539a": "docker run --rm --name juice-shop -p 0.0.0.0:3000:3000 -p :::3000:3000 bkimminich/juice-shop /juice-shop/build/app.js",
+  "417907c51e0d": "docker run --name attacker -p 0.0.0.0:5000:5000 -p :::5000:5000 -v /home/rvv/PycharmProjects/Python.Network.Pivot/static:/app/static:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/templates:/app/templates:rw -v /home/rvv/PycharmProjects/Python.Network.Pivot/attacker:/app:rw --network pythonnetworkpivot_flat_network pythonnetworkpivot_attacker bash",
+  "1f2d3f236ce1": "docker run --name stupefied_perlman bkimminich/juice-shop /juice-shop/build/app.js"
 }

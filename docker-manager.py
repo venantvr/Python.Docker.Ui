@@ -88,7 +88,8 @@ class DockerManagerApp:
         self.launch_cmds_text.tag_configure("highlight", background="lightblue")
         self.launch_cmds_text.bind('<Motion>', self.highlight_line)
         self.launch_cmds_text.bind('<Leave>', self.clear_highlight)
-        self.launch_cmds_text.bind('<Button-1>', self.launch_container_from_cmd)
+        # self.launch_cmds_text.bind('<Button-1>', self.launch_container_from_cmd)
+        self.launch_cmds_text.bind('<Double-1>', self.launch_container_from_cmd)
 
         # Ajout du menu contextuel (clic droit)
         self.context_menu = tk.Menu(self.root, tearoff=0)
